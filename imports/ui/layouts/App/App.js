@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, NavLink } from 'react-router-dom';
 import { Button } from 'reactstrap';
+import bootstrap from 'bootstrap';
 
 class App extends React.Component {
   render() {
