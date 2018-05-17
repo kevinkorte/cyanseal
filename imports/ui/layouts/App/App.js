@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, NavLink } from 'react-router-dom';
 import { Button } from 'reactstrap';
+import Signup from '../../pages/Signup/Signup';
 import bootstrap from 'bootstrap';
 
 class App extends React.Component {
@@ -25,14 +26,6 @@ class Index extends React.Component {
         <div>Index</div>
         <Button color="danger">Danger!</Button>
       </div>
-    )
-  }
-}
-
-class Signup extends React.Component {
-  render() {
-    return (
-      <div>Signup</div>
     )
   }
 }
