@@ -1,7 +1,12 @@
 import React from 'react';
 import autoBind from 'react-autobind';
+import PropTypes from 'prop-types';
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { StripeProvider, Elements } from 'react-stripe-elements';
 import validate from '../../../modules/validate';
+
+const stripe = Stripe('pk_test_v6a9Z1nhKeKpqXAJ6uP26Vpa');
+const elements = stripe.elements();
 
 class Signup extends React.Component {
   constructor(props) {
@@ -14,43 +19,132 @@ class Signup extends React.Component {
     const component = this;
 
     validate(component.form, {
+      rules: {
+        firstName: {
+          required: true,
+        },
+        lastName: {
+          required: true,
+        },
+        emailAddress: {
+          required: true,
+          email: true,
+        },
+        password: {
+          required: true,
+          minlength: 6,
+        },
+      },
+      messages: {
+        firstName: {
+          required: 'What\'s your first name?',
+        },
+        lastName: {
+          required: 'What\'s your last name?',
+        },
+        emailAddress: {
+          required: 'Need an email address here.',
+          email: 'Is this email address correct?',
+        },
+        password: {
+          required: 'Need a password here.',
+          minlength: 'Please use at least six characters.',
+        },
+      },
       submitHandler() { component.handleSubmit(component.form); },
     });
   }
 
   handleSubmit(form) {
-    console.log('handled submit', form);
+    const { history } = this.props;
+
+    Accounts.createUser({
+      email: form.emailAddress.value,
+      password: form.password.value,
+      profile: {
+        name: {
+          first: form.firstName.value,
+          last: form.lastName.value,
+        },
+      },
+    }, (error) => {
+      if (error) {
+        Bert.alert(error.reason, 'danger');
+      } else {
+        Meteor.call('users.sendVerificationEmail');
+        Bert.alert('Welcome!', 'success');
+        history.push('/documents');
+      }
+    });
   }
 
   render() {
     return (
       <div className="Signup">
-        <Container>
-          <Row>
-            <Col md="6">
-              <h4 className="page-header">Sign Up</h4>
-              <Form onSubmit={event => event.preventDefault()}>
-                <Row>
-                  <Col xs="6">
+        <Row>
+          <Col xs={12} sm={6} md={5} lg={4}>
+            <h4 className="page-header">Sign Up</h4>
+            <Row>
+              <StripeProvider apiKey="pk_test_v6a9Z1nhKeKpqXAJ6uP26Vpa">
+                <Elements>
+                  
+                </Elements>
+              </StripeProvider>
+            </Row>
+            <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
+              <Row>
+                <Col xs={6}>
                   <FormGroup>
-                    <Label for="exampleEmail">Email</Label>
-                    <Input
-                      type="email"
-                      name="email"
-                      id="exampleEmail"
-                      placeholder="with a placeholder"
+                    <Label for="firstName">First Name</Label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      className="form-control"
+                      id="firstName"
                     />
                   </FormGroup>
-                  </Col>
-                </Row>
-                <Button>Submit</Button>
-              </Form>
-            </Col> 
-          </Row>
-        </Container>
+                </Col>
+                <Col xs={6}>
+                  <FormGroup>
+                  <Label for="lastName">Last Name</Label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      className="form-control"
+                      id="lastName"
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <FormGroup>
+              <Label for="email">Email</Label>
+                <input
+                  type="email"
+                  name="emailAddress"
+                  className="form-control"
+                  id="email"
+                />
+              </FormGroup>
+              <FormGroup>
+              <Label for="password">Password</Label>
+                <input
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  id="password"
+                />
+              </FormGroup>
+              <Button type="submit">Sign Up</Button>
+            </form>
+          </Col>
+        </Row>
       </div>
-    )
+    );
   }
 }
 
-export default Signup
+Signup.propTypes = {
+  history: PropTypes.object.isRequired,
+};
+
+export default Signup;
