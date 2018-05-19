@@ -1,9 +1,9 @@
 import React from 'react';
 import { injectStripe, CardElement } from 'react-stripe-elements';
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { Accounts } from 'meteor/accounts-base';
 import validate from '../../../modules/validate';
 const stripe = Stripe(Meteor.settings.public.pk_test);
-console.log(Meteor.settings.public.pk_test);
 
 class PaymentForm extends React.Component {
 
@@ -51,7 +51,28 @@ class PaymentForm extends React.Component {
   handleSubmit(form) {
     const { history } = this.props;
     this.props.stripe.createToken().then(({token}) => {
-      Meteor.call('signup.createCustomer', token);
+      Accounts.createUser({
+        email: form.emailAddress.value,
+        password: form.password.value,
+        profile: {
+          name: {
+            first: form.firstName.value,
+            last: form.lastName.value
+          }
+        }
+      }, (error) => {
+        if (error) {
+          console.error(error);
+        } else {
+          Meteor.call('signup.createCustomer', token, form.email.value, (error, customer) => {
+            if ( error ) {
+              console.error(error);
+            } else {
+              console.log(customer);
+            }
+          });
+        }
+      })
     });
   }
 
@@ -61,10 +82,10 @@ class PaymentForm extends React.Component {
       <div className="Signup">
         <Container>
           <Row>
-            <Col lg={6}>
+            <Col lg={6} className="bg-white py-3">
               <h4 className="page-header">Sign Up</h4>
               <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-                <CardElement className="stripe-payment-input" onSubmit={this.submitHandler} />
+                <CardElement className="stripe-payment-input form-control" />
                 <Row>
                   <Col xs={6}>
                     <FormGroup>
@@ -90,6 +111,15 @@ class PaymentForm extends React.Component {
                   </Col>
                 </Row>
                 <FormGroup>
+                  <Label for="organization">Organization Name</Label>
+                  <input
+                    type="text"
+                    name="organization"
+                    className="form-control"
+                    id="organization"
+                  />
+                </FormGroup>
+                <FormGroup>
                 <Label for="email">Email</Label>
                   <input
                     type="email"
@@ -110,7 +140,7 @@ class PaymentForm extends React.Component {
                 <Button type="submit">Sign Up</Button>
               </form>
             </Col>
-            <Col lg={4}>
+            <Col lg={4} className="bg-dark">
               Sidebar
             </Col>
           </Row>

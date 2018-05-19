@@ -17,43 +17,14 @@ class Signup extends React.Component {
 
   componentDidMount() {
 
-    const component = this;
+    document.body.classList.add("signup-page");
+    
+  }
 
-    validate(component.form, {
-      rules: {
-        firstName: {
-          required: true,
-        },
-        lastName: {
-          required: true,
-        },
-        emailAddress: {
-          required: true,
-          email: true,
-        },
-        password: {
-          required: true,
-          minlength: 6,
-        },
-      },
-      messages: {
-        firstName: {
-          required: 'What\'s your first name?',
-        },
-        lastName: {
-          required: 'What\'s your last name?',
-        },
-        emailAddress: {
-          required: 'Need an email address here.',
-          email: 'Is this email address correct?',
-        },
-        password: {
-          required: 'Need a password here.',
-          minlength: 'Please use at least six characters.',
-        },
-      },
-      submitHandler() { component.handleSubmit(component.form); },
-    });
+  componentWillUnmount() {
+
+    document.body.classList.remove("signup-page");
+    
   }
 
   handleSubmit(form) {
@@ -98,7 +69,7 @@ class PaymentInput extends React.Component {
   render() {
     return (
       <Elements>
-        <InjectedForm onSubmit={this.submitHandler}/>
+        <InjectedForm />
       </Elements>
     );
   }
