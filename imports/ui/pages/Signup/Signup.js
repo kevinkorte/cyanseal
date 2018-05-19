@@ -6,7 +6,7 @@ import { StripeProvider, Elements } from 'react-stripe-elements';
 import validate from '../../../modules/validate';
 import InjectedForm from '../../components/Stripe/Stripe';
 
-const stripe = Stripe('pk_test_v6a9Z1nhKeKpqXAJ6uP26Vpa');
+const stripe = Stripe(Meteor.settings.public.pk_test);
 const elements = stripe.elements();
 
 class Signup extends React.Component {
@@ -58,12 +58,8 @@ class Signup extends React.Component {
 
   handleSubmit(form) {
     const { history } = this.props;
-    console.log(this.props);
+    console.log(form);
 
-
-    this.props.stripe.createToken().then(({token}) => {
-      console.log('Received Stripe Token:', token);
-    })
 
     // Accounts.createUser({
     //   email: form.emailAddress.value,
@@ -87,68 +83,9 @@ class Signup extends React.Component {
 
   render() {
     return (
-      <div className="Signup">
-        <Container>
-          <Row>
-            <Col lg={6}>
-              <h4 className="page-header">Sign Up</h4>
-              <Row>
-                <StripeProvider apiKey="pk_test_v6a9Z1nhKeKpqXAJ6uP26Vpa">
-                  <PaymentInput />
-                </StripeProvider>
-              </Row>
-              {/* <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}> */}
-                <Row>
-                  <Col xs={6}>
-                    <FormGroup>
-                      <Label for="firstName">First Name</Label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        className="form-control"
-                        id="firstName"
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col xs={6}>
-                    <FormGroup>
-                    <Label for="lastName">Last Name</Label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        className="form-control"
-                        id="lastName"
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <FormGroup>
-                <Label for="email">Email</Label>
-                  <input
-                    type="email"
-                    name="emailAddress"
-                    className="form-control"
-                    id="email"
-                  />
-                </FormGroup>
-                <FormGroup>
-                <Label for="password">Password</Label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    id="password"
-                  />
-                </FormGroup>
-                <Button type="submit">Sign Up</Button>
-              {/* </form> */}
-            </Col>
-            <Col lg={4}>
-            Sidebar
-            </Col>
-          </Row>
-        </Container>
-      </div>
+      <StripeProvider apiKey={Meteor.settings.public.pk_test}>
+        <PaymentInput />
+      </StripeProvider>
     );
   }
 }
@@ -161,7 +98,7 @@ class PaymentInput extends React.Component {
   render() {
     return (
       <Elements>
-        <InjectedForm />
+        <InjectedForm onSubmit={this.submitHandler}/>
       </Elements>
     );
   }
