@@ -2,6 +2,8 @@ import React from 'react';
 import { injectStripe, CardElement } from 'react-stripe-elements';
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import { Accounts } from 'meteor/accounts-base';
+import fontawesome from '@fortawesome/fontawesome';
+import Shield from '../../icons/Shield';
 import validate from '../../../modules/validate';
 const stripe = Stripe(Meteor.settings.public.pk_test);
 
@@ -76,16 +78,46 @@ class PaymentForm extends React.Component {
     });
   }
 
+  handleChange(event) {
+    console.log('handle change');
+    console.log(event);
+
+  }
+
   render() {
 
     return (
-      <div className="Signup">
+      <div className="Signup d-flex align-items-center">
         <Container>
+ 
           <Row>
             <Col lg={6} className="bg-white py-3">
-              <h4 className="page-header">Sign Up</h4>
+            <Row className="mb-5">
+            <Col xs={6}>
+            Logo
+            </Col>
+            <Col xs={6} className="d-flex justify-content-end">
+            <div>
+              <small className="text-muted">Have an account?</small>
+              <Button color="outline-secondary btn-sm btn-sm-radius ml-2">Login</Button>
+            </div>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+          <Col>
+          <h4 className="page-header text-center">
+            <div className="d-block">Get Started</div>
+            <small className="text-muted">You're only a moment away from trying it out.</small>
+          </h4>
+          </Col>
+          </Row>
+
               <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-                <CardElement className="stripe-payment-input form-control" />
+                <CardElement className="stripe-payment-input" onChange={this.handleChange} style={{base: {fontSize: '18px'}}} classes={{base: 'form-control', focus: 'form-control-focus'}} />
+                <small id="emailHelp" className="form-text text-muted d-flex align-items-center">
+                <Shield width="15" fill="#6c757d" />
+                <span className="pl-1">Secure</span>
+                </small>
                 <Row>
                   <Col xs={6}>
                     <FormGroup>
@@ -111,15 +143,6 @@ class PaymentForm extends React.Component {
                   </Col>
                 </Row>
                 <FormGroup>
-                  <Label for="organization">Organization Name</Label>
-                  <input
-                    type="text"
-                    name="organization"
-                    className="form-control"
-                    id="organization"
-                  />
-                </FormGroup>
-                <FormGroup>
                 <Label for="email">Email</Label>
                   <input
                     type="email"
@@ -140,7 +163,7 @@ class PaymentForm extends React.Component {
                 <Button type="submit">Sign Up</Button>
               </form>
             </Col>
-            <Col lg={4} className="bg-dark">
+            <Col lg={4} className="bg-white">
               Sidebar
             </Col>
           </Row>
