@@ -2,12 +2,20 @@ import React from 'react';
 import { injectStripe, CardElement } from 'react-stripe-elements';
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import { Accounts } from 'meteor/accounts-base';
+import autoBind from 'react-autobind';
 import fontawesome from '@fortawesome/fontawesome';
-import Shield from '../../icons/Shield';
+import ExclamationSolid from '../../icons/ExclamationSolid';
 import validate from '../../../modules/validate';
 const stripe = Stripe(Meteor.settings.public.pk_test);
 
 class PaymentForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isCardError: false
+    }
+    autoBind(this);
+  }
 
   componentDidMount() {
 
@@ -79,8 +87,19 @@ class PaymentForm extends React.Component {
   }
 
   handleChange(event) {
-    console.log('handle change');
-    console.log(event);
+    console.log(event.error);
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+      this.setState({
+        isCardError: true
+      });
+      displayError.textContent = event.error.message;
+    } else {
+      this.setState({
+        isCardError: false
+      });
+      displayError.textContent = ''
+    }
 
   }
 
@@ -113,10 +132,10 @@ class PaymentForm extends React.Component {
           </Row>
 
               <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-                <CardElement className="stripe-payment-input" onChange={this.handleChange} style={{base: {fontSize: '18px'}}} classes={{base: 'form-control', focus: 'form-control-focus'}} />
-                <small id="emailHelp" className="form-text text-muted d-flex align-items-center">
-                <Shield width="15" fill="#6c757d" />
-                <span className="pl-1">Secure</span>
+                <CardElement className="stripe-payment-input" onChange={this.handleChange} style={{base: {fontSize: '18px'}}} classes={{base: 'form-control', invalid: 'form-control is-invalid'}} />
+                <small id="emailHelp" className="form-text text-danger d-flex align-items-center">
+                { this.state.isCardError ? <ExclamationSolid width="15" fill="#dc3545" /> : null }
+                <span className="pl-1" id="card-errors"></span>
                 </small>
                 <Row>
                   <Col xs={6}>
@@ -163,7 +182,7 @@ class PaymentForm extends React.Component {
                 <Button type="submit">Sign Up</Button>
               </form>
             </Col>
-            <Col lg={4} className="bg-white">
+            <Col lg={4} className="signup-sidebar">
               Sidebar
             </Col>
           </Row>
